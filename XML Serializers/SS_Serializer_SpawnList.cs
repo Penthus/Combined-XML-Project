@@ -318,14 +318,27 @@ namespace XML_Serializer.XML
         {
             [XmlElement] public string NAMEDMOB { get; set; }
             [XmlElement] public string LOCKOUTNAME { get; set; }
-            [XmlAttribute] public string period { get; set; }
-            [XmlElement] public string LOCKOUTFIXED { get; set; }
+            [XmlElement] public LOCKOUTFIXED LOCKOUTFIXED { get; set; }
             [XmlElement] public string SHIPCONFIG { get; set; }
+            [XmlElement] public SPAWNBASE SPAWNBASE { get; set; }
+
             //[XmlElement] public string RARITY { get; set; }
             //[XmlElement] public int COST { get; set; }
             //[XmlElement] public int WEIGHT { get; set; }
             //[XmlElement] public int SPACE { get; set; }
             //[XmlElement] public string TYPE { get; set; }
+        }
+
+        [Serializable]
+        public class LOCKOUTFIXED
+        {
+            [XmlAttribute] public string period { get; set; }
+        }
+
+        [Serializable]
+        public class SPAWNBASE
+        {
+            [XmlElement] public string LEVEL { get; set; }
         }
 
         [Serializable]
