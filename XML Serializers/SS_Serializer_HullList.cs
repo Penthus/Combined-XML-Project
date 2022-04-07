@@ -1,25 +1,26 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace XML_Serializer.XML
 {
-    public class SS_Serializer_Inventory
+    public class SS_Serializer_HullList
     {
-
         [Serializable]
-        public class Inventory
+        public class HULLLIST
         {
             private static XmlSerializer _serializerXml;
 
-            [XmlElement("PILLBOX")]
-            public List<inventorySHIP> SHIP { get; set; }
+            [XmlElement("HULL")] public List<HULL> HULL { get; set; }
 
-            public Inventory()
+            public HULLLIST()
             {
-                SHIP = new();
+                HULL = new List<HULL>();
             }
 
             private static XmlSerializer SerializerXml
@@ -28,7 +29,7 @@ namespace XML_Serializer.XML
                 {
                     if ((_serializerXml == null))
                     {
-                        _serializerXml = new XmlSerializerFactory().CreateSerializer(typeof(Inventory));
+                        _serializerXml = new XmlSerializerFactory().CreateSerializer(typeof(HULLLIST));
                     }
 
                     return _serializerXml;
@@ -38,7 +39,7 @@ namespace XML_Serializer.XML
             #region Serialize/Deserialize
 
             /// <summary>
-            /// Serialize inventory object
+            /// Serialize GALAXY object
             /// </summary>
             /// <returns>XML value</returns>
             public virtual string Serialize()
@@ -47,12 +48,12 @@ namespace XML_Serializer.XML
                 MemoryStream memoryStream = null;
                 try
                 {
-                    memoryStream = new();
-                    XmlWriterSettings xmlWriterSettings = new();
+                    memoryStream = new MemoryStream();
+                    XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
                     XmlWriter xmlWriter = XmlWriter.Create(memoryStream, xmlWriterSettings);
                     SerializerXml.Serialize(xmlWriter, this);
                     memoryStream.Seek(0, SeekOrigin.Begin);
-                    streamReader = new(memoryStream);
+                    streamReader = new StreamReader(memoryStream);
                     return streamReader.ReadToEnd();
                 }
                 finally
@@ -70,16 +71,16 @@ namespace XML_Serializer.XML
             }
 
             /// <summary>
-            /// Deserializes inventory object
+            /// Deserializes GALAXY object
             /// </summary>
             /// <param name="input">string to deserialize</param>
-            /// <param name="obj">Output inventory object</param>
+            /// <param name="obj">Output GALAXY object</param>
             /// <param name="exception">output Exception value if deserialize failed</param>
             /// <returns>true if this Serializer can deserialize the object; otherwise, false</returns>
-            public static bool Deserialize(string input, out Inventory obj, out Exception exception)
+            public static bool Deserialize(string input, out HULLLIST obj, out Exception exception)
             {
                 exception = null;
-                obj = default;
+                obj = default(HULLLIST);
                 try
                 {
                     obj = Deserialize(input);
@@ -92,18 +93,19 @@ namespace XML_Serializer.XML
                 }
             }
 
-            public static bool Deserialize(string input, out Inventory obj)
+            public static bool Deserialize(string input, out HULLLIST obj)
             {
-                return Deserialize(input, out obj, out _);
+                Exception exception = null;
+                return Deserialize(input, out obj, out exception);
             }
 
-            public static Inventory Deserialize(string input)
+            public static HULLLIST Deserialize(string input)
             {
                 StringReader stringReader = null;
                 try
                 {
-                    stringReader = new(input);
-                    return ((Inventory)(SerializerXml.Deserialize(XmlReader.Create(stringReader))));
+                    stringReader = new StringReader(input);
+                    return ((HULLLIST)(SerializerXml.Deserialize(XmlReader.Create(stringReader))));
                 }
                 finally
                 {
@@ -114,13 +116,14 @@ namespace XML_Serializer.XML
                 }
             }
 
-            public static Inventory Deserialize(Stream s)
+            public static HULLLIST Deserialize(Stream s)
             {
-                return ((Inventory)(SerializerXml.Deserialize(s)));
+                return ((HULLLIST)(SerializerXml.Deserialize(s)));
             }
 
             #endregion
 
+            #region Save/Load
 
             public bool SaveToFile(string fileName, out Exception exception)
             {
@@ -143,7 +146,7 @@ namespace XML_Serializer.XML
                 try
                 {
                     string dataString = Serialize();
-                    FileInfo outputFile = new(fileName);
+                    FileInfo outputFile = new FileInfo(fileName);
                     streamWriter = outputFile.CreateText();
                     streamWriter.WriteLine(dataString);
                     streamWriter.Close();
@@ -158,16 +161,16 @@ namespace XML_Serializer.XML
             }
 
             /// <summary>
-            /// Deserializes xml markup from file into an inventory object
+            /// Deserializes xml markup from file into an GALAXY object
             /// </summary>
             /// <param name="fileName">File to load and deserialize</param>
-            /// <param name="obj">Output inventory object</param>
+            /// <param name="obj">Output GALAXY object</param>
             /// <param name="exception">output Exception value if deserialize failed</param>
             /// <returns>true if this Serializer can deserialize the object; otherwise, false</returns>
-            public static bool LoadFromFile(string fileName, out Inventory obj, out Exception exception)
+            public static bool LoadFromFile(string fileName, out HULLLIST obj, out Exception exception)
             {
                 exception = null;
-                obj = default;
+                obj = default(HULLLIST);
                 try
                 {
                     obj = LoadFromFile(fileName);
@@ -180,19 +183,20 @@ namespace XML_Serializer.XML
                 }
             }
 
-            public static bool LoadFromFile(string fileName, out Inventory obj)
+            public static bool LoadFromFile(string fileName, out HULLLIST obj)
             {
-                return LoadFromFile(fileName, out obj, out _);
+                Exception exception = null;
+                return LoadFromFile(fileName, out obj, out exception);
             }
 
-            public static Inventory LoadFromFile(string fileName)
+            public static HULLLIST LoadFromFile(string fileName)
             {
                 FileStream file = null;
                 StreamReader sr = null;
                 try
                 {
-                    file = new(fileName, FileMode.Open, FileAccess.Read);
-                    sr = new(file);
+                    file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                    sr = new StreamReader(file);
                     string dataString = sr.ReadToEnd();
                     sr.Close();
                     file.Close();
@@ -213,32 +217,35 @@ namespace XML_Serializer.XML
             }
         }
 
+        #endregion
+
         [Serializable]
-        public class inventorySHIP
+        public class HULL
         {
+            [XmlElement("INIT")] public List<INIT> INIT { get; set; }
 
-            [XmlArrayItem("ITEM", IsNullable = false)]
-            public List<inventorySHIPITEM> ITEMLIST { get; set; }
+            [XmlElement("VALUES")] public List<VALUES> VALUES { get; set; }
 
-            [XmlAttribute] public string name { get; set; }
+            [XmlAttribute]
+            public string @class { get; set; }
 
-            public inventorySHIP()
+            public HULL()
             {
-                ITEMLIST = new();
+                INIT = new();
+                VALUES = new();
             }
         }
 
-
         [Serializable]
-        public class inventorySHIPITEM
+        public class INIT
         {
-
-            [XmlAttribute] public string nm { get; set; }
-            [XmlAttribute] public bool eqp { get; set; }
-            [XmlAttribute] public uint id { get; set; }
-            [XmlAttribute] public uint m { get; set; }
-
+            [XmlElement] public string NAME { get; set; }
         }
-    }
+        [Serializable]
+        public class VALUES
+        {
+            [XmlElement] public string TECHLEVEL { get; set; }
+        }
 
+    }
 }

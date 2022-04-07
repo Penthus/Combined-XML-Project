@@ -10,131 +10,92 @@ namespace Combined_XML_Program
 {
     class XmlValueReplacement
     {
-        static void Start()
+        public static void Start()
         {
             //  var xmlFilename = "superitems.xml";
             //  var txtFilename = "superitems Info.txt";
-            var xmlFilename = "drones_permanent.xml";
-            var txtFilename = "drones Info.txt";
-            var writeFilename = "Write.txt";
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var xmlPath = Path.Combine(currentDirectory, xmlFilename);
-            var txtPath = Path.Combine(currentDirectory, txtFilename);
-            var writePath = Path.Combine(currentDirectory, writeFilename);
-            XElement xmlProducts = XElement.Load(xmlPath);
-            var productsList = GetValues(txtPath);
-            //GetProductInfo(xmlProducts);
-            // ChangeProductInfo(xmlProducts,productsList);
-            PrintDroneInfo(xmlProducts, productsList, writePath);
+
+            //var xmlFilename = "drones_permanent.xml";
+            //var txtFilename = "drones Info.txt";
+            //var writeFilename = "Write.txt";
+            //var currentDirectory = Directory.GetCurrentDirectory();
+            //var xmlPath = Path.Combine(currentDirectory, xmlFilename);
+            //var txtPath = Path.Combine(currentDirectory, txtFilename);
+            //var writePath = Path.Combine(currentDirectory, writeFilename);
+            //XElement xmlSuperItems = XElement.Load(xmlPath);
+            //var superItemFilterList = Filtering.GetDroneValues(txtPath);
+
+            // ChangeProductInfo(xmlSuperItems,dronesList);
         }
 
-        private static List<Drones> GetValues(string path)
+        private static void PrintDroneInfo(XElement xmlDrones, List<Drones> dronesList, string writePath)
         {
-            List<Drones> valuesCollection = new List<Drones>();
-
-            using (var sr = new StreamReader(path))
-            {
-                string l = string.Empty;
-
-                while ((l = sr.ReadLine()) != null)
-                {
-                    var parts = l.Split(',');
-                    valuesCollection.Add(new Drones(parts[0], Convert.ToInt32(parts[1])));
-                }
-
-                return valuesCollection;
-            }
-        }
-
-        private static void GetProductInfo(XElement xmlProducts)
-        {
-            Console.WriteLine("------------Get Product Information------------");
-            var Drones =
-                from name in xmlProducts.Descendants("PILLBOX").Descendants("INIT")
-                    //orderby (int)name?.Parent.Element("VALUES").Element("CHARGINGTIME")
-                select name;
-
-            foreach (var e in Drones)
-            {
-                Console.WriteLine(e);
-
-            }
-        }
-
-        private static void PrintDroneInfo(XElement xmlProducts, List<Drones> productsList, string writePath)
-        {
-            List<string> _filter = new List<string>();
-            foreach (var p in productsList)
+            List<string> _filter = new();
+            foreach (var p in dronesList)
             {
                 _filter.Add(p.NAME);
             }
 
-            /*var Products =
-                from name in xmlProducts.Descendants("DRONE").Descendants("VALUES").Descendants("DEPLOYMENTLIST")
-                where _filter.Any(s => ((string) name.Element("ITEM").Attribute("name") ?? "").Contains(s))
-                select name;*/
+            // var query = SuperItems.Where(x => _filter.Any(x => (SuperItems.Elements("ITEM").Attributes("name").Contains(x))));
 
-            var Products =
-                from name in xmlProducts.Descendants("PILLBOX").Descendants("VALUES").Descendants("DEPLOYMENTLIST")
+            var Drones =
+                from name in xmlDrones.Descendants("PILLBOXLIST").Descendants("VALUES").Descendants("DEPLOYMENTLIST")
                 where _filter.Any(s => (name.Elements("ITEM").Select(e => e.Attribute("name").Value ?? "").Contains(s)))
                 select name;
 
-            // var query = Products.Where(x => _filter.Any(x => (Products.Elements("ITEM").Attributes("name").Contains(x))));
-
-            foreach (var product in Products)
+            foreach (var drone in Drones)
             {
-                Console.WriteLine(product);
+                Console.WriteLine(drone);
                 File.AppendAllText(writePath,
-                    ($"{product.Parent.Parent.Element("INIT").Element("NAME").Value}{Environment.NewLine}"));
-                foreach (var attributes in product.Elements("ITEM").Attributes("name"))
+                    ($"{drone.Parent.Parent.Element("INIT").Element("NAME").Value}{Environment.NewLine}"));
+                foreach (var attributes in drone.Elements("ITEM").Attributes("name"))
                 {
                     File.AppendAllText(writePath,
                         ($"{attributes}{Environment.NewLine}"));
                     Console.WriteLine(attributes);
                 }
             }
-
             Console.WriteLine();
         }
 
-        private static void ChangeProductInfo(XElement xmlProducts, List<Products> productsList)
+        private static void ChangeProductInfo(XElement xmlSuperItems, List<SuperItems> superItemFilterList)
         {
-            List<string> _filter = new List<string>();
-            foreach (var p in productsList)
+            List<string> _filter = new();
+            foreach (var p in superItemFilterList)
             {
                 _filter.Add(p.NAME);
             }
 
-            var Products =
-                from name in xmlProducts.Descendants("MISC").Descendants("INIT")
-                where _filter.Any(s => ((string)name.Element("NAME") ?? "").Contains(s))
-                select name;
+            var SuperItems =
+                from SuperItem in xmlSuperItems.Descendants("MISC").Descendants("INIT")
+                where _filter.Any(s => ((string)SuperItem.Element("NAME") ?? "").Contains(s))
+                select SuperItem;
 
-            foreach (var e in Products)
+            foreach (var superitem in SuperItems)
             {
                 Console.WriteLine("------------Change Product Information------------");
                 Console.WriteLine("Old Product Information");
-                Console.WriteLine(e);
+                Console.WriteLine(superitem);
 
                 int index = -1;
-                for (int i = 0; i < productsList.Count; i++)
+                for (int i = 0; i < superItemFilterList.Count; i++)
                 {
-                    if (productsList[i].NAME == e.Element("NAME").Value)
+                    if (superItemFilterList[i].NAME == superitem.Element("NAME")?.Value)
                     {
                         index = i;
                     }
                 }
 
-                Console.WriteLine($"Name:{productsList[index].NAME}");
-                XElement value = e.Parent.Element("VALUES");
-                Console.WriteLine($"Charging Time:{value.Element("CHARGINGTIME").Value}");
-                value.SetElementValue("CHARGINGTIME", productsList[index].CHARGINGTIME);
+                Console.WriteLine($"Name:{superItemFilterList[index].NAME}");
+                XElement value = superitem.Parent?.Element("VALUES");
+                Console.WriteLine($"Charging Time:{value.Element("CHARGINGTIME")?.Value}");
+                value.SetElementValue("CHARGINGTIME", superItemFilterList[index].CHARGINGTIME);
                 Console.WriteLine("New Product Information");
-                Console.WriteLine($"Name:{productsList[index].NAME}");
-                Console.WriteLine($"Charging Time:{value.Element("CHARGINGTIME").Value}");
+                Console.WriteLine($"Name:{superItemFilterList[index].NAME}");
+                Console.WriteLine($"Charging Time:{value.Element("CHARGINGTIME")?.Value}");
             }
 
-            xmlProducts.Save("dif.xml");
+            xmlSuperItems.Save("dif.xml");
 
         }
     }

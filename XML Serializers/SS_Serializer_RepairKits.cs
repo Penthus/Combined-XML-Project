@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
-using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -20,7 +18,7 @@ namespace XML_Serializer.XML
 
             public MISCLIST()
             {
-                MISC = new List<misclistMISC>();
+                MISC = new();
             }
 
             private static XmlSerializer SerializerXml
@@ -46,12 +44,12 @@ namespace XML_Serializer.XML
                 MemoryStream memoryStream = null;
                 try
                 {
-                    memoryStream = new MemoryStream();
-                    System.Xml.XmlWriterSettings xmlWriterSettings = new System.Xml.XmlWriterSettings();
-                    System.Xml.XmlWriter xmlWriter = XmlWriter.Create(memoryStream, xmlWriterSettings);
+                    memoryStream = new();
+                    XmlWriterSettings xmlWriterSettings = new();
+                    XmlWriter xmlWriter = XmlWriter.Create(memoryStream, xmlWriterSettings);
                     SerializerXml.Serialize(xmlWriter, this);
                     memoryStream.Seek(0, SeekOrigin.Begin);
-                    streamReader = new StreamReader(memoryStream);
+                    streamReader = new(memoryStream);
                     return streamReader.ReadToEnd();
                 }
                 finally
@@ -77,7 +75,7 @@ namespace XML_Serializer.XML
             public static bool Deserialize(string input, out MISCLIST obj, out Exception exception)
             {
                 exception = null;
-                obj = default(MISCLIST);
+                obj = default;
                 try
                 {
                     obj = Deserialize(input);
@@ -92,8 +90,7 @@ namespace XML_Serializer.XML
 
             public static bool Deserialize(string input, out MISCLIST obj)
             {
-                Exception exception = null;
-                return Deserialize(input, out obj, out exception);
+                return Deserialize(input, out obj, out _);
             }
 
             public static MISCLIST Deserialize(string input)
@@ -101,7 +98,7 @@ namespace XML_Serializer.XML
                 StringReader stringReader = null;
                 try
                 {
-                    stringReader = new StringReader(input);
+                    stringReader = new(input);
                     return ((MISCLIST)(SerializerXml.Deserialize(XmlReader.Create(stringReader))));
                 }
                 finally
@@ -141,7 +138,7 @@ namespace XML_Serializer.XML
                 try
                 {
                     string dataString = Serialize();
-                    FileInfo outputFile = new FileInfo(fileName);
+                    FileInfo outputFile = new(fileName);
                     streamWriter = outputFile.CreateText();
                     streamWriter.WriteLine(dataString);
                     streamWriter.Close();
@@ -165,7 +162,7 @@ namespace XML_Serializer.XML
             public static bool LoadFromFile(string fileName, out MISCLIST obj, out Exception exception)
             {
                 exception = null;
-                obj = default(MISCLIST);
+                obj = default;
                 try
                 {
                     obj = LoadFromFile(fileName);
@@ -180,8 +177,7 @@ namespace XML_Serializer.XML
 
             public static bool LoadFromFile(string fileName, out MISCLIST obj)
             {
-                Exception exception = null;
-                return LoadFromFile(fileName, out obj, out exception);
+                return LoadFromFile(fileName, out obj, out _);
             }
 
             public static MISCLIST LoadFromFile(string fileName)
@@ -190,8 +186,8 @@ namespace XML_Serializer.XML
                 StreamReader sr = null;
                 try
                 {
-                    file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                    sr = new StreamReader(file);
+                    file = new(fileName, FileMode.Open, FileAccess.Read);
+                    sr = new(file);
                     string dataString = sr.ReadToEnd();
                     sr.Close();
                     file.Close();
@@ -224,8 +220,8 @@ namespace XML_Serializer.XML
 
         public misclistMISC()
         {
-            INIT = new List<misclistMISCINIT>();
-            VALUES = new List<misclistMISCVALUES>();
+            INIT = new();
+            VALUES = new();
         }
     }
 

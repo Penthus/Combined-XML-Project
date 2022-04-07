@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
-using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -16,11 +14,11 @@ namespace XML_Serializer.XML
             private static XmlSerializer _serializerXml;
 
             [XmlElement("BASE")]
-            public List<BASELISTBASE> BASE { get; set; }
+            public List<BASELISTBASE> BASELISTBASE { get; set; }
 
             public BASELIST()
             {
-                BASE = new List<BASELISTBASE>();
+                BASELISTBASE = new();
             }
 
             private static XmlSerializer SerializerXml
@@ -46,12 +44,12 @@ namespace XML_Serializer.XML
                 MemoryStream memoryStream = null;
                 try
                 {
-                    memoryStream = new MemoryStream();
-                    System.Xml.XmlWriterSettings xmlWriterSettings = new System.Xml.XmlWriterSettings();
-                    System.Xml.XmlWriter xmlWriter = XmlWriter.Create(memoryStream, xmlWriterSettings);
+                    memoryStream = new();
+                    XmlWriterSettings xmlWriterSettings = new();
+                    XmlWriter xmlWriter = XmlWriter.Create(memoryStream, xmlWriterSettings);
                     SerializerXml.Serialize(xmlWriter, this);
                     memoryStream.Seek(0, SeekOrigin.Begin);
-                    streamReader = new StreamReader(memoryStream);
+                    streamReader = new(memoryStream);
                     return streamReader.ReadToEnd();
                 }
                 finally
@@ -77,7 +75,7 @@ namespace XML_Serializer.XML
             public static bool Deserialize(string input, out BASELIST obj, out Exception exception)
             {
                 exception = null;
-                obj = default(BASELIST);
+                obj = default;
                 try
                 {
                     obj = Deserialize(input);
@@ -92,8 +90,7 @@ namespace XML_Serializer.XML
 
             public static bool Deserialize(string input, out BASELIST obj)
             {
-                Exception exception = null;
-                return Deserialize(input, out obj, out exception);
+                return Deserialize(input, out obj, out _);
             }
 
             public static BASELIST Deserialize(string input)
@@ -101,7 +98,7 @@ namespace XML_Serializer.XML
                 StringReader stringReader = null;
                 try
                 {
-                    stringReader = new StringReader(input);
+                    stringReader = new(input);
                     return ((BASELIST)(SerializerXml.Deserialize(XmlReader.Create(stringReader))));
                 }
                 finally
@@ -141,7 +138,7 @@ namespace XML_Serializer.XML
                 try
                 {
                     string dataString = Serialize();
-                    FileInfo outputFile = new FileInfo(fileName);
+                    FileInfo outputFile = new(fileName);
                     streamWriter = outputFile.CreateText();
                     streamWriter.WriteLine(dataString);
                     streamWriter.Close();
@@ -165,7 +162,7 @@ namespace XML_Serializer.XML
             public static bool LoadFromFile(string fileName, out BASELIST obj, out Exception exception)
             {
                 exception = null;
-                obj = default(BASELIST);
+                obj = default;
                 try
                 {
                     obj = LoadFromFile(fileName);
@@ -180,8 +177,7 @@ namespace XML_Serializer.XML
 
             public static bool LoadFromFile(string fileName, out BASELIST obj)
             {
-                Exception exception = null;
-                return LoadFromFile(fileName, out obj, out exception);
+                return LoadFromFile(fileName, out obj, out _);
             }
 
             public static BASELIST LoadFromFile(string fileName)
@@ -190,8 +186,8 @@ namespace XML_Serializer.XML
                 StreamReader sr = null;
                 try
                 {
-                    file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                    sr = new StreamReader(file);
+                    file = new(fileName, FileMode.Open, FileAccess.Read);
+                    sr = new(file);
                     string dataString = sr.ReadToEnd();
                     sr.Close();
                     file.Close();
@@ -215,22 +211,22 @@ namespace XML_Serializer.XML
     [Serializable]
     public class BASELISTBASE
     {
-        [XmlElement("INIT")] public List<BASELISTBASEINIT> INIT { get; set; }
+        [XmlElement("INIT")] public List<INIT> INIT { get; set; }
 
-        [XmlElement("VALUES")] public List<BASELISTBASEVALUES> VALUES { get; set; }
+        [XmlElement("VALUES")] public List<VALUES> VALUES { get; set; }
 
         [XmlAttribute]
         public string @class { get; set; }
 
         public BASELISTBASE()
         {
-            INIT = new List<BASELISTBASEINIT>();
-            VALUES = new List<BASELISTBASEVALUES>();
+            INIT = new();
+            VALUES = new();
         }
     }
 
     [Serializable]
-    public class BASELISTBASEINIT
+    public partial class INIT
     {
 
         [XmlElement] public string NAME { get; set; }
@@ -244,7 +240,7 @@ namespace XML_Serializer.XML
 
     }
     [Serializable]
-    public class BASELISTBASEVALUES
+    public partial class VALUES
     {
 
         [XmlElement] public int TECHLEVEL { get; set; }
