@@ -66,6 +66,20 @@ namespace Combined_XML_Program
 
             return valuesCollection;
         }
+        public static List<Items> GetBaseGearValues(string path)
+        {
+            List<Items> valuesCollection = new();
+
+            using var sr = new StreamReader(path);
+            string l = string.Empty;
+
+            while ((l = sr.ReadLine()) != null)
+            {
+                valuesCollection.Add(new Items(l));
+            }
+
+            return valuesCollection;
+        }
 
         // TODO - Work out how to grab a file of basetiers (andonis,ambrosia etc) and then a file of XYZ (X,Y,Z) and use them as a filter
         /*public static List<XYZGear> ProcessXYZGearFilter(string BaseTier, string XYZ)

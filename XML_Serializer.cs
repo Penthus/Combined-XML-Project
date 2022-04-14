@@ -34,7 +34,7 @@ namespace Combined_XML_Program
             var combined = basePath + "Spawn" + $@"\Combined.txt";
             var shipConfigs = basePath + "Spawn" + $@"\Ship Configs.txt";
             var hullConfigs = basePath + "Spawn" + $@"\Hull Configs.txt";
-            var droneConfigs = basePath + "Spawn" + $@"\Drone Configs.txt";
+            var droneConfigs = basePath + "Spawn" + $@"\Drone Configs.txt"; 
             var baseGearConfigs = basePath + "Spawn" + $@"\BaseGear Configs.txt";
 
             DecideXmlToUse(xmlTypes, hasClearedGal, combined, shipConfigs, hasClearedShip, hullConfigs, hasClearedDrone, droneConfigs, hasClearedBaseGear, baseGearConfigs);
@@ -95,17 +95,17 @@ namespace Combined_XML_Program
                         break;
 
                     case "BASELIST":
-                        if (!hasClearedDrone)
+                        if (!hasClearedBaseGear)
                         {
                             if (File.Exists(baseGearConfigs))
                             {
-                                //File.Delete(baseGearConfigs);
+                                File.Delete(baseGearConfigs);
                             }
 
                             hasClearedBaseGear = true;
                         }
 
-                        BaseGearXML(baseGearConfigs, xmlType.Path);
+                        GetBaseGearXML(baseGearConfigs, xmlType.Path);
                         break;
                     default:
                         Console.WriteLine($"{xmlType} is not recognised");
@@ -245,10 +245,10 @@ namespace Combined_XML_Program
 
         }
 
-        private static void BaseGearXML(string baseGearConfigs, string path)
+        private static void GetBaseGearXML(string? baseGearConfigs, string path)
         {
 
-            var filters = Filtering.ProcessFilter(baseGearConfigs);
+            //var filters = Filtering.ProcessFilter(baseGearConfigs);
             string[] filterA = new[]
             {
                 "Arcadian",
@@ -290,6 +290,7 @@ namespace Combined_XML_Program
                             foreach (var item in product.ITEM)
                             {
                                 Console.WriteLine(item.name);
+                                File.AppendAllText(baseGearConfigs, $"{item.name}{Environment.NewLine}");
                             }
                         }
 
