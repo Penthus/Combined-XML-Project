@@ -2,110 +2,94 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.Linq;
 using XML_Serializer.XML;
+using static Combined_XML_Program.StateMachine;
 
 namespace Combined_XML_Program
 {
     class XML_Serializer
     {
-        public static int GLOBALCOUNTER = 0;
+        public static int GLOBALCOUNTER = 0; //hack hack hacky solution
+        public static string basePath = AppDomain.CurrentDomain.BaseDirectory;
+        public static string folderPath = "\\XML\\";
         public static void Start()
         {
-            var basePath = AppDomain.CurrentDomain.BaseDirectory;
-
-            //string[] fileEntries = Directory.GetFiles(basePath + "\\XML\\Drones\\", "*.xml");
-
-
-            //string[] customGalFileEntries = Directory.GetFiles("C:\\SS\\dev\\content\\data\\customgals2", "*.xml", SearchOption.AllDirectories);
-            //string[] shipyardFileEntries = Directory.GetFiles("C:\\SS\\dev\\content\\data\\ships", "*.xml", SearchOption.AllDirectories);
-            //string[] combinedFileEntries = customGalFileEntries.Union(shipyardFileEntries).ToArray();
-            //List<XmlTypes> xmlTypes = GetXmlTypes(combinedFileEntries);
-
-            string[] fileEntries = Directory.GetFiles(basePath + "\\XML\\Bases\\", "*.xml");
+            string[] fileEntries = Directory.GetFiles(basePath + folderPath, "*.xml");
             List<XmlTypes> xmlTypes = GetXmlTypes(fileEntries);
 
-            bool hasClearedGal = false;
-            bool hasClearedShip = false;
-            bool hasClearedDrone = false;
-            bool hasClearedBaseGear = false;
-            var combined = basePath + "Spawn" + $@"\Combined.txt";
-            var shipConfigs = basePath + "Spawn" + $@"\Ship Configs.txt";
-            var hullConfigs = basePath + "Spawn" + $@"\Hull Configs.txt";
-            var droneConfigs = basePath + "Spawn" + $@"\Drone Configs.txt"; 
-            var baseGearConfigs = basePath + "Spawn" + $@"\BaseGear Configs.txt";
+            Config config = new();
+            config.shouldDeleteOldConfigs = GetUserInput("Do you want old configs to be deleted?");
 
-            DecideXmlToUse(xmlTypes, hasClearedGal, combined, shipConfigs, hasClearedShip, hullConfigs, hasClearedDrone, droneConfigs, hasClearedBaseGear, baseGearConfigs);
+            DecideXmlToUse(xmlTypes, config);
         }
 
-        private static void DecideXmlToUse(List<XmlTypes> xmlTypes, bool hasClearedGal, string combined, string shipConfigs,
-            bool hasClearedShip, string hullConfigs, bool hasClearedDrone, string droneConfigs, bool hasClearedBaseGear, string baseGearConfigs)
+        private static void DecideXmlToUse(List<XmlTypes> xmlTypes, Config config)
         {
             foreach (var xmlType in xmlTypes)
             {
                 switch (xmlType.Root)
                 {
                     case "GALAXY":
-                        if (!hasClearedGal)
+                        if (!config.hasClearedGal)
                         {
-                            if (File.Exists(combined))
+                            if (File.Exists(config.combined))
                             {
-                                File.Delete(combined);
+                                File.Delete(config.combined);
                             }
 
-                            if (File.Exists(shipConfigs))
+                            if (File.Exists(config.shipConfigs))
                             {
-                                File.Delete(shipConfigs);
+                                File.Delete(config.shipConfigs);
                             }
 
-                            hasClearedGal = true;
+                            config.hasClearedGal = true;
                         }
 
-                        SpawnListXML(shipConfigs, combined, xmlType.Path);
+                        SpawnListXML(config.shipConfigs, config.combined, xmlType.Path);
                         break;
 
                     case "HULLLIST":
-                        if (!hasClearedShip)
+                        if (!config.hasClearedShip)
                         {
-                            if (File.Exists(hullConfigs))
+                            if (File.Exists(config.hullConfigs))
                             {
-                                File.Delete(hullConfigs);
+                                File.Delete(config.hullConfigs);
                             }
 
-                            hasClearedShip = true;
+                            config.hasClearedShip = true;
                         }
 
-                        ShipyardXML(shipConfigs, hullConfigs, xmlType.Path);
+                        ShipyardXML(config.shipConfigs, config.hullConfigs, xmlType.Path);
                         break;
 
                     case "PILLBOXLIST":
-                        if (!hasClearedDrone)
+                        if (!config.hasClearedDrone)
                         {
-                            if (File.Exists(droneConfigs))
+                            if (File.Exists(config.droneConfigs))
                             {
                                 //File.Delete(droneConfigs);
                             }
 
-                            hasClearedShip = true;
+                            config.hasClearedShip = true;
                         }
 
-                        DroneXML(droneConfigs, xmlType.Path);
+                        DroneXML(config.droneConfigs, xmlType.Path);
                         break;
 
                     case "BASELIST":
-                        if (!hasClearedBaseGear)
+                        if (!config.hasClearedBaseGear)
                         {
-                            if (File.Exists(baseGearConfigs))
+                            if (File.Exists(config.baseGearConfigs))
                             {
-                                File.Delete(baseGearConfigs);
+                                File.Delete(config.baseGearConfigs);
                             }
 
-                            hasClearedBaseGear = true;
+                            config.hasClearedBaseGear = true;
                         }
 
-                        GetBaseGearXML(baseGearConfigs, xmlType.Path);
+                        GetBaseGearXML(config.baseGearConfigs, xmlType.Path);
                         break;
                     default:
                         Console.WriteLine($"{xmlType} is not recognised");
@@ -114,6 +98,7 @@ namespace Combined_XML_Program
             }
         }
 
+        //Pass in XML files, Parse them, Determine their Root note and output that information into a List<XmlTypes>
         public static List<XmlTypes> GetXmlTypes(string[] fileEntries)
         {
             List<XmlTypes> valueCollection = new();

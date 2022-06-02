@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
-using System.Xml.XPath;
-using Extensions = System.Xml.Linq.Extensions;
+using System.Xml;
 
 namespace Combined_XML_Program
 {
@@ -37,7 +33,7 @@ namespace Combined_XML_Program
 
         }
 
-        private static void PrintDroneInfo(XElement xmlDrones, List<Drones> dronesList, string writePath)
+        private static void PrintDroneInfo(XElement xmlDrones, List<Drone> dronesList, string writePath)
         {
             List<string> _filter = new();
             foreach (var p in dronesList)
@@ -45,7 +41,7 @@ namespace Combined_XML_Program
                 _filter.Add(p.NAME);
             }
 
-            // var query = SuperItems.Where(x => _filter.Any(x => (SuperItems.Elements("ITEM").Attributes("name").Contains(x))));
+            // var query = SuperItem.Where(x => _filter.Any(x => (SuperItem.Elements("ITEM").Attributes("name").Contains(x))));
 
             var Drones =
                 from name in xmlDrones.Descendants("PILLBOXLIST").Descendants("VALUES").Descendants("DEPLOYMENTLIST")
@@ -66,7 +62,7 @@ namespace Combined_XML_Program
             }
             Console.WriteLine();
         }
-        private static void ChangeBaseGearWarping(string[] fileEntries, List<Items> baseGearFilterList)
+        private static void ChangeBaseGearWarping(string[] fileEntries, List<Item> baseGearFilterList)
         {
             List<string> _filter = new();
             foreach (var items in baseGearFilterList)
@@ -123,7 +119,7 @@ namespace Combined_XML_Program
                 //xmlBaseGear.Save("dif.xml");
             }
         }
-        private static void ChangeSuperItemChargingTime(XElement xmlSuperItems, List<SuperItems> superItemFilterList)
+        private static void ChangeSuperItemChargingTime(XElement xmlSuperItems, List<SuperItem> superItemFilterList)
         {
             List<string> _filter = new();
             foreach (var p in superItemFilterList)
@@ -137,7 +133,7 @@ namespace Combined_XML_Program
 
 
 
-            //var SuperItems =
+            //var SuperItem =
             //    from SuperItem in xmlSuperItems.Descendants("MISC").Descendants("INIT")
             //    where _filter.Any(s => ((string)SuperItem.Element("NAME"))?.Contains(s) ?? false)
             //    select SuperItem;

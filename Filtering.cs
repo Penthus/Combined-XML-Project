@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using XML_Serializer.XML;
 
 namespace Combined_XML_Program
@@ -51,9 +47,9 @@ namespace Combined_XML_Program
             return xmls;
         }
 
-        public static List<Drones> GetDroneValues(string path)
+        public static List<Drone> GetDroneValues(string path)
         {
-            List<Drones> valuesCollection = new();
+            List<Drone> valuesCollection = new();
 
             using var sr = new StreamReader(path);
             string l = string.Empty;
@@ -66,16 +62,16 @@ namespace Combined_XML_Program
 
             return valuesCollection;
         }
-        public static List<Items> GetBaseGearValues(string path)
+        public static List<Item> GetBaseGearValues(string path)
         {
-            List<Items> valuesCollection = new();
+            List<Item> valuesCollection = new();
 
             using var sr = new StreamReader(path);
             string l = string.Empty;
 
             while ((l = sr.ReadLine()) != null)
             {
-                valuesCollection.Add(new Items(l));
+                valuesCollection.Add(new Item(l));
             }
 
             return valuesCollection;
