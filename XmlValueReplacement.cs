@@ -11,60 +11,26 @@ namespace Combined_XML_Program
     {
         public static void Start()
         {
-            //  var xmlFilename = "superitems.xml";
-            //  var txtFilename = "superitems Info.txt";
-
-            //var xmlFilename = "drones_permanent.xml";
-            //var txtFilename = "drones Info.txt";
-            //var writeFilename = "Write.txt";
-            //var currentDirectory = Directory.GetCurrentDirectory();
-            //var xmlPath = Path.Combine(currentDirectory, xmlFilename);
-            //var txtPath = Path.Combine(currentDirectory, txtFilename);
-            //var writePath = Path.Combine(currentDirectory, writeFilename);
-            //XElement xmlSuperItems = XElement.Load(xmlPath);
-            //var superItemFilterList = Filtering.GetDroneValues(txtPath);
-
-            // ChangeSuperItemChargingTime(xmlSuperItems,dronesList);
-            var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            string[] fileEntries = Directory.GetFiles(basePath + "\\XML\\Bases\\Gear\\", "*.xml");
-            var baseGearConfigs = basePath + "Spawn" + $@"\BaseGear Configs.txt";
-            var baseGearFilterList = Filtering.GetBaseGearValues(baseGearConfigs);
-            ChangeBaseGearWarping(fileEntries,baseGearFilterList);
-
+            List<string> configs = Program.config.GetConfigs();
+            //var baseGearConfigs = Program.basePath + "Spawn" + $@"\BaseGear Configs.txt";
+           /* foreach (var config in configs)
+            {
+                
+            }
+          //  var baseGearFilterList = FilterHulls.GetBaseGearValues(baseGearConfigs);
+           // ExtractNamesForFilter();
+          //  ChangeBaseGearWarping(Program.fileEntries,baseGearFilterList);
+           */
         }
 
-        private static void PrintDroneInfo(XElement xmlDrones, List<Drone> dronesList, string writePath)
+        private static List<string> ExtractNamesForFilter(List<Item> baseGearFilterList)
         {
-            List<string> _filter = new();
-            foreach (var p in dronesList)
-            {
-                _filter.Add(p.NAME);
-            }
-
-            // var query = SuperItem.Where(x => _filter.Any(x => (SuperItem.Elements("ITEM").Attributes("name").Contains(x))));
-
-            var Drones =
-                from name in xmlDrones.Descendants("PILLBOXLIST").Descendants("VALUES").Descendants("DEPLOYMENTLIST")
-                where _filter.Any(s => (name.Elements("ITEM").Select(e => e.Attribute("name").Value ?? "").Contains(s)))
-                select name;
-
-            foreach (var drone in Drones)
-            {
-                Console.WriteLine(drone);
-                File.AppendAllText(writePath,
-                    ($"{drone.Parent.Parent.Element("INIT").Element("NAME").Value}{Environment.NewLine}"));
-                foreach (var attributes in drone.Elements("ITEM").Attributes("name"))
-                {
-                    File.AppendAllText(writePath,
-                        ($"{attributes}{Environment.NewLine}"));
-                    Console.WriteLine(attributes);
-                }
-            }
-            Console.WriteLine();
+            throw new NotImplementedException();
         }
-        private static void ChangeBaseGearWarping(string[] fileEntries, List<Item> baseGearFilterList)
+
+        private static void ChangeBaseGearWarping(string[] fileEntries)
         {
-            List<string> _filter = new();
+           /* List<string> _filter = new();
             foreach (var items in baseGearFilterList)
             {
                 _filter.Add(items.Name);
@@ -90,7 +56,7 @@ namespace Combined_XML_Program
                 var BaseGear =
                     from Gear in xmlBaseGear.Descendants("MISC").Descendants("INIT")
                     where _filter.Any(s => ((string) Gear.Element("NAME") ?? "").Contains(s))
-                    select Gear;
+                    select Gear;*/
 
                 //foreach (var superitem in BaseGear)
                 //{
@@ -118,7 +84,7 @@ namespace Combined_XML_Program
 
                 //xmlBaseGear.Save("dif.xml");
             }
-        }
+        
         private static void ChangeSuperItemChargingTime(XElement xmlSuperItems, List<SuperItem> superItemFilterList)
         {
             List<string> _filter = new();

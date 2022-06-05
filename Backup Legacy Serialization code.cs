@@ -1,44 +1,16 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace XML_Serializer.XML
+namespace Combined_XML_Program
 {
-    public class SS_Serializer_Inventory
+    class Backup_Legacy_Serialization_code
     {
-
-        [Serializable]
-        public class Inventory
-        {
-            private static XmlSerializer _serializerXml;
-
-            [XmlElement("PILLBOX")]
-            public List<inventorySHIP> SHIP { get; set; }
-
-            public Inventory()
-            {
-                SHIP = new();
-            }
-
-            private static XmlSerializer SerializerXml
-            {
-                get
-                {
-                    if ((_serializerXml == null))
-                    {
-                        _serializerXml = new XmlSerializerFactory().CreateSerializer(typeof(Inventory));
-                    }
-
-                    return _serializerXml;
-                }
-            }
-
-            #region Serialize/Deserialize
-
+        /*            #region Serialize/Deserialize
             /// <summary>
-            /// Serialize inventory object
+            /// Serialize BASELIST object
             /// </summary>
             /// <returns>XML value</returns>
             public virtual string Serialize()
@@ -61,7 +33,6 @@ namespace XML_Serializer.XML
                     {
                         streamReader.Dispose();
                     }
-
                     if ((memoryStream != null))
                     {
                         memoryStream.Dispose();
@@ -70,13 +41,13 @@ namespace XML_Serializer.XML
             }
 
             /// <summary>
-            /// Deserializes inventory object
+            /// Deserializes BASELIST object
             /// </summary>
             /// <param name="input">string to deserialize</param>
-            /// <param name="obj">Output inventory object</param>
+            /// <param name="obj">Output BASELIST object</param>
             /// <param name="exception">output Exception value if deserialize failed</param>
             /// <returns>true if this Serializer can deserialize the object; otherwise, false</returns>
-            public static bool Deserialize(string input, out Inventory obj, out Exception exception)
+            public static bool Deserialize(string input, out BASELIST obj, out Exception exception)
             {
                 exception = null;
                 obj = default;
@@ -92,18 +63,18 @@ namespace XML_Serializer.XML
                 }
             }
 
-            public static bool Deserialize(string input, out Inventory obj)
+            public static bool Deserialize(string input, out BASELIST obj)
             {
                 return Deserialize(input, out obj, out _);
             }
 
-            public static Inventory Deserialize(string input)
+            public static BASELIST Deserialize(string input)
             {
                 StringReader stringReader = null;
                 try
                 {
                     stringReader = new(input);
-                    return ((Inventory)(SerializerXml.Deserialize(XmlReader.Create(stringReader))));
+                    return ((BASELIST)(SerializerXml.Deserialize(XmlReader.Create(stringReader))));
                 }
                 finally
                 {
@@ -114,11 +85,10 @@ namespace XML_Serializer.XML
                 }
             }
 
-            public static Inventory Deserialize(Stream s)
+            public static BASELIST Deserialize(Stream s)
             {
-                return ((Inventory)(SerializerXml.Deserialize(s)));
+                return ((BASELIST)(SerializerXml.Deserialize(s)));
             }
-
             #endregion
 
 
@@ -158,13 +128,13 @@ namespace XML_Serializer.XML
             }
 
             /// <summary>
-            /// Deserializes xml markup from file into an inventory object
+            /// Deserializes xml markup from file into an BASELIST object
             /// </summary>
             /// <param name="fileName">File to load and deserialize</param>
-            /// <param name="obj">Output inventory object</param>
+            /// <param name="obj">Output BASELIST object</param>
             /// <param name="exception">output Exception value if deserialize failed</param>
             /// <returns>true if this Serializer can deserialize the object; otherwise, false</returns>
-            public static bool LoadFromFile(string fileName, out Inventory obj, out Exception exception)
+            public static bool LoadFromFile(string fileName, out BASELIST obj, out Exception exception)
             {
                 exception = null;
                 obj = default;
@@ -180,12 +150,12 @@ namespace XML_Serializer.XML
                 }
             }
 
-            public static bool LoadFromFile(string fileName, out Inventory obj)
+            public static bool LoadFromFile(string fileName, out BASELIST obj)
             {
                 return LoadFromFile(fileName, out obj, out _);
             }
 
-            public static Inventory LoadFromFile(string fileName)
+            public static BASELIST LoadFromFile(string fileName)
             {
                 FileStream file = null;
                 StreamReader sr = null;
@@ -204,41 +174,11 @@ namespace XML_Serializer.XML
                     {
                         file.Dispose();
                     }
-
                     if ((sr != null))
                     {
                         sr.Dispose();
                     }
                 }
-            }
-        }
-
-        [Serializable]
-        public class inventorySHIP
-        {
-
-            [XmlArrayItem("ITEM", IsNullable = false)]
-            public List<inventorySHIPITEM> ITEMLIST { get; set; }
-
-            [XmlAttribute] public string name { get; set; }
-
-            public inventorySHIP()
-            {
-                ITEMLIST = new();
-            }
-        }
-
-
-        [Serializable]
-        public class inventorySHIPITEM
-        {
-
-            [XmlAttribute] public string nm { get; set; }
-            [XmlAttribute] public bool eqp { get; set; }
-            [XmlAttribute] public uint id { get; set; }
-            [XmlAttribute] public uint m { get; set; }
-
-        }
+            }*/
     }
-
 }

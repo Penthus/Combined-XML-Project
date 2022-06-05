@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 #pragma warning disable
 namespace XML_Serializer.XML
 {
-    public class SS_Serializer_SpawnList
+    public class SS_Serializer_Galaxies
     {
         [Serializable]
         public class GALAXY

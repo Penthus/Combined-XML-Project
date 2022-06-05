@@ -4,25 +4,23 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Combined_XML_Program.XML_Serializers;
 using XML_Serializer.XML;
-using static Combined_XML_Program.StateMachine;
+using static Combined_XML_Program.StateManager;
 
 namespace Combined_XML_Program
 {
-    class XML_Serializer
+    class XmlParser
     {
-        public static int GLOBALCOUNTER = 0; //hack hack hacky solution
-        public static string basePath = AppDomain.CurrentDomain.BaseDirectory;
-        public static string folderPath = "\\XML\\";
+        public static int GLOBALCOUNTER = 0; //Hack solution
+
         public static void Start()
         {
-            string[] fileEntries = Directory.GetFiles(basePath + folderPath, "*.xml");
-            List<XmlTypes> xmlTypes = GetXmlTypes(fileEntries);
+            List<XmlTypes> xmlTypes = GetXmlTypes(Program.fileEntries);
 
-            Config config = new();
-            config.shouldDeleteOldConfigs = GetUserInput("Do you want old configs to be deleted?");
+            Program.config.shouldDeleteOldConfigs = GetUserInput("Do you want old configs to be deleted?");
 
-            DecideXmlToUse(xmlTypes, config);
+            DecideXmlToUse(xmlTypes, Program.config);
         }
 
         private static void DecideXmlToUse(List<XmlTypes> xmlTypes, Config config)
@@ -79,16 +77,18 @@ namespace Combined_XML_Program
                         break;
 
                     case "BASELIST":
-                        if (!config.hasClearedBaseGear)
+                        if (config.shouldDeleteOldConfigs)
                         {
-                            if (File.Exists(config.baseGearConfigs))
+                            if (!config.hasClearedBaseGear)
                             {
-                                File.Delete(config.baseGearConfigs);
+                                if (File.Exists(config.baseGearConfigs))
+                                {
+                                    File.Delete(config.baseGearConfigs);
+                                }
+
+                                config.hasClearedBaseGear = true;
                             }
-
-                            config.hasClearedBaseGear = true;
                         }
-
                         GetBaseGearXML(config.baseGearConfigs, xmlType.Path);
                         break;
                     default:
@@ -138,7 +138,7 @@ namespace Combined_XML_Program
         private static void SpawnListXML(string? ShipConfigs, string? Combined, string? path)
         {
 
-            var Xml = SS_Serializer_SpawnList.GALAXY.LoadFromFile(path);
+            var Xml = SS_Serializer_Galaxies.GALAXY.LoadFromFile(path);
             var filename = System.IO.Path.GetFileNameWithoutExtension(path);
 
             foreach (var g in Xml.SPAWNLIST)
@@ -172,7 +172,7 @@ namespace Combined_XML_Program
 
         private static void ShipyardXML(string? shipConfigs, string? hullConfigs, string? path)
         {
-            var filters = Filtering.ProcessFilter(shipConfigs);
+            var filters = FilterHulls.ProcessFilter(shipConfigs);
             var Xml = SS_Serializer_Shipyard.SHIPYARD.LoadFromFile(path);
 
             foreach (var ship in Xml.SHIP)
@@ -187,29 +187,29 @@ namespace Combined_XML_Program
         private static void DroneXML(string? droneConfigs, string? path)
         {
 
-            var filters = Filtering.ProcessFilter(droneConfigs);
+            var filters = FilterHulls.ProcessFilter(droneConfigs);
 
-            // Serialization approach
+            //// Serialization approach
 
-            var Xml = SS_Serializer_PillboxList.PILLBOXLIST.LoadFromFile(path);
+            //var Xml = SS_Serializer_PillboxList.PILLBOXLIST.LoadFromFile(path);
 
-            foreach (var pillbox in Xml.PILLBOX)
-            {
-                foreach (var init in pillbox.INIT)
-                {
-                    if (filters.Any(s => init.NAME.Equals(s)))
-                    {
-                        Console.WriteLine($"{init.NAME}");
-                        Console.WriteLine(init.TSLENABLED);
-                        init.TSLENABLED = !init.TSLENABLED;
-                        Console.WriteLine(init.TSLENABLED);
-                        Console.WriteLine(pillbox.VALUES[0].PREVENTWARP);
-                        Console.WriteLine(pillbox.VALUES[0].TECHLEVEL);
-                        // init.Element("VALUES").SetElementValue();
-                    }
-                    //File.AppendAllText(hullConfigs, $"{ship.name},{ship.HULL}{Environment.NewLine}");
-                }
-            }
+            //foreach (var pillbox in Xml.PILLBOX)
+            //{
+            //    foreach (var init in pillbox.INIT)
+            //    {
+            //        if (filters.Any(s => init.NAME.Equals(s)))
+            //        {
+            //            Console.WriteLine($"{init.NAME}");
+            //            Console.WriteLine(init.TSLENABLED);
+            //            init.TSLENABLED = !init.TSLENABLED;
+            //            Console.WriteLine(init.TSLENABLED);
+            //            Console.WriteLine(pillbox.VALUES[0].PREVENTWARP);
+            //            Console.WriteLine(pillbox.VALUES[0].TECHLEVEL);
+            //            // init.Element("VALUES").SetElementValue();
+            //        }
+            //        //File.AppendAllText(hullConfigs, $"{ship.name},{ship.HULL}{Environment.NewLine}");
+            //    }
+            //}
 
             // LINQ approach
 
@@ -257,7 +257,7 @@ namespace Combined_XML_Program
             List<string> filtersB = new List<string>(filterB);
             // Serialization approach
 
-            var Xml = SS_Serializer_BaseGearBlueprintsDecay.BASELIST.LoadFromFile(path);
+            var Xml = SS_Serializer_Items.BASELIST.LoadFromFile(path);
 
             foreach (var bases in Xml.BASE)
             {
@@ -304,7 +304,7 @@ namespace Combined_XML_Program
 
             return false;
         }
-        private static string GetHullConfiguration(SS_Serializer_SpawnList.SPAWNAMBUSH i)
+        private static string GetHullConfiguration(SS_Serializer_Galaxies.SPAWNAMBUSH i)
         {
             foreach (var ambushers in i.AMBUSHERS_CONFIGURATION)
             {
@@ -322,7 +322,7 @@ namespace Combined_XML_Program
             return "";
         }
 
-        private static void ProcessXmlData(SS_Serializer_SpawnList.SPAWNER j, string configs, string combined)
+        private static void ProcessXmlData(SS_Serializer_Galaxies.SPAWNER j, string configs, string combined)
         {
             if (j.LOCKOUTNAME?.Length > 0 && j.LOCKOUTFIXED?.period.Length > 0)
             {
@@ -335,7 +335,7 @@ namespace Combined_XML_Program
             }
         }
 
-        private static void ProcessXmlData(SS_Serializer_SpawnList.SPAWNER j, string configs, string combined, string hull)
+        private static void ProcessXmlData(SS_Serializer_Galaxies.SPAWNER j, string configs, string combined, string hull)
         {
             if (j.LOCKOUTNAME?.Length > 0 && j.LOCKOUTFIXED?.period.Length > 0)
             {
